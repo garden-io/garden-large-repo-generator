@@ -11,34 +11,19 @@ variables:
   projectname: sharedServices
   withPlan: false # requires plan to deploy services
   deploymentRegistry:
-      hostname: docker-registry-hostname
-      namespace: namespace
+    hostname: docker-registry-hostname
+    namespace: namespace
 
 environments:
   - name: dev
-    defaultNamespace: thx # change to enabling services
     variables:
       springProfiles: gcp,gcp-dev
 
 providers:
   - name: jib # <----
     environments: ["dev"]
-  - name: kubernetes
+  - name: local-kubernetes
     environments: ["dev"]
-    context: k8s_context
-    deploymentRegistry: ${var.deploymentRegistry}
-    buildMode: kaniko
-    kaniko:
-      namespace: null #setting it to null, builder pods are started in the project namespace instead of the garden-system namespace
-    imagePullSecrets:
-      - name: registry-config
-        namespace: default
-    resources: 
-      builder:
-        requests:
-          ephemeralStorage: 4096
-          cpu: "2"
-          memory: 8192
   - name: pulumi
     environments: ["dev"]
     # The version of pulumi to use. Set to `null` to use whichever version of `pulumi` is on your PATH.
